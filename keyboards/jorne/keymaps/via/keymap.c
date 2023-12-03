@@ -64,21 +64,85 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 };
 
+const rgblight_segment_t PROGMEM my_default_layer[] = RGBLIGHT_LAYER_SEGMENTS(
+    { 0, 6, 50, 200, 16 },
+    { 28, 6, 50, 200, 16 }
+);
+const rgblight_segment_t PROGMEM my_layer1_layer[] = RGBLIGHT_LAYER_SEGMENTS(
+    { 0, 3, HSV_CYAN },
+    { 28, 3, HSV_CYAN }
+);
+const rgblight_segment_t PROGMEM my_layer2_layer[] = RGBLIGHT_LAYER_SEGMENTS(
+    { 3, 3, HSV_PURPLE },
+    { 31, 3, HSV_PURPLE }
+);
+
+const rgblight_segment_t PROGMEM my_layer3_layer[] = RGBLIGHT_LAYER_SEGMENTS(
+    { 0, 1, HSV_AZURE },
+    { 28, 1, HSV_AZURE }
+);
+const rgblight_segment_t PROGMEM my_layer4_layer[] = RGBLIGHT_LAYER_SEGMENTS(
+    { 0, 1, HSV_BLUE },
+    { 28, 1, HSV_BLUE }
+);
+
+const rgblight_segment_t* const PROGMEM my_rgb_layers[] = RGBLIGHT_LAYERS_LIST(
+    my_default_layer,
+    my_layer1_layer,
+    my_layer2_layer,
+    my_layer3_layer,
+    my_layer4_layer
+);
+
+void keyboard_post_init_user(void) {
+    // Enable the LED layers
+    rgblight_layers = my_rgb_layers;
+}
+
+layer_state_t default_layer_state_set_user(layer_state_t state) {
+    rgblight_set_layer_state(0, layer_state_cmp(state, _QWERTY));
+    return state;
+}
+
 layer_state_t layer_state_set_user(layer_state_t state) {
+    rgblight_set_layer_state(1, layer_state_cmp(state, _LOWER));
+    rgblight_set_layer_state(2, layer_state_cmp(state, _RAISE));
+
     return update_tri_layer_state(state, _LOWER, _RAISE, _ADJUST);
 }
 
-bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-  switch (keycode) {
-    case RGBRST:
-      #ifdef RGBLIGHT_ENABLE
-        if (record->event.pressed) {
-          eeconfig_update_rgblight_default();
-          rgblight_enable();
-        }
-      #endif
-      break;
-  }
-  return true;
-}
+bool process_record_user(uint16_t keycode, keyrecord_t* record) {
+    // QK_LAYER_TAP
+    // LT(0,
+    if ((keycode & 0x4F00) == 0x4000) {
+        if (!record->tap.count && record->event.pressed) {
+            rgblight_blink_layer_repeat(3, 200, 2);
+            tap_code16(C(keycode & 0xFF));
 
+            return false;
+        }
+    }
+
+    // QK_MOD_TAP
+    // MT(MOD_RCTL | MOD_RSFT | MOD_RALT | MOD_RGUI,
+    if ((keycode & 0x7F00) == 0x7F00) {
+        if (!record->tap.count && record->event.pressed) {
+            rgblight_blink_layer_repeat(4, 200, 2);
+            tap_code16(A(keycode & 0xFF));
+            return false;
+        }
+    }
+
+    switch (keycode) {
+    case RGBRST:
+#ifdef RGBLIGHT_ENABLE
+        if (record->event.pressed) {
+            eeconfig_update_rgblight_default();
+            rgblight_enable();
+        }
+#endif
+        break;
+    }
+
+    return true;
+}
