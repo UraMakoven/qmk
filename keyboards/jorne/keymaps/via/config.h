@@ -23,12 +23,23 @@
 
 #define RGBLIGHT_LAYERS
 #define RGBLIGHT_LAYER_BLINK
+
 #define SPLIT_TRANSPORT_MIRROR
 #define SPLIT_LAYER_STATE_ENABLE
-#define SPLIT_WPM_ENABLE
+// #define SPLIT_WPM_ENABLE
 #define SPLIT_OLED_ENABLE
-#define RGBLIGHT_SLEEP
-#define RGB_DISABLE_WHEN_USB_SUSPENDED
+// #define SPLIT_ST7565_ENABLE
+#define SPLIT_ACTIVITY_ENABLE
+
+// #define RGBLIGHT_SLEEP
+// #define RGB_DISABLE_WHEN_USB_SUSPENDED 1
+// #define SPLIT_WATCHDOG_ENABLE 
+
+#define USB_SUSPEND_WAKEUP_DELAY 500
+
+#define RGBLIGHT_SLEEP  // enable rgblight_suspend() and rgblight_wakeup() in keymap.c
+#define RGBLIGHT_TIMEOUT 60000  // ms to wait until rgblight time out, 900K ms is 15min.
+
 
 // If you are using an Elite C rev3 on the slave side, uncomment the lines below:
 // #define SPLIT_USB_DETECT
