@@ -111,6 +111,22 @@ layer_state_t layer_state_set_user(layer_state_t state) {
     return update_tri_layer_state(state, _LOWER, _RAISE, _ADJUST);
 }
 
+uint16_t get_tapping_term(uint16_t keycode, keyrecord_t* record) {
+    // QK_LAYER_TAP
+    // LT(0,
+    if ((keycode & 0x4F00) == 0x4000) {
+        return 500;
+    }
+
+    // QK_MOD_TAP
+    // MT(MOD_RCTL | MOD_RSFT | MOD_RALT | MOD_RGUI,
+    if ((keycode & 0x7F00) == 0x7F00) {
+        return 500;
+    }
+
+    return TAPPING_TERM;
+}
+
 bool process_record_user(uint16_t keycode, keyrecord_t* record) {
     // QK_LAYER_TAP
     // LT(0,
