@@ -56,17 +56,18 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 ),
 
 [_ADJUST] = LAYOUT(
-  RESET,   RGBRST,  KC_ASUP, KC_ASTG, KC_ASDN, _______, _______,      _______, _______, KC_ASDN, KC_ASTG, KC_ASUP, RGBRST,  RESET,
+  RESET,   RGBRST,  _______, _______, _______, _______, _______,      _______, _______, _______, _______, _______, RGBRST,  RESET,
            RGB_TOG, RGB_HUI, RGB_SAI, RGB_VAI, _______, _______,      _______, _______, RGB_VAI, RGB_SAI, RGB_HUI, RGB_TOG,
            RGB_MOD, RGB_HUD, RGB_SAD, RGB_VAD, _______, _______,      _______, _______, RGB_VAD, RGB_SAD, RGB_HUD, RGB_MOD,
-                                      _______, SH_TG,   _______,      _______, SH_TG,   _______
+                                      _______,  SH_TG,  _______,      _______,  SH_TG,  _______
 ),
 
 };
 
-const rgblight_segment_t PROGMEM my_default_layer[] = RGBLIGHT_LAYER_SEGMENTS(
-    { 0, 6, 50, 200, 16 },
-    { 28, 6, 50, 200, 16 }
+
+const rgblight_segment_t PROGMEM my_shift_layer[] = RGBLIGHT_LAYER_SEGMENTS(
+    { 2, 2, HSV_GOLD },
+    { 30, 2, HSV_GOLD }
 );
 const rgblight_segment_t PROGMEM my_layer1_layer[] = RGBLIGHT_LAYER_SEGMENTS(
     { 0, 3, HSV_CYAN },
@@ -87,7 +88,7 @@ const rgblight_segment_t PROGMEM my_layer4_layer[] = RGBLIGHT_LAYER_SEGMENTS(
 );
 
 const rgblight_segment_t* const PROGMEM my_rgb_layers[] = RGBLIGHT_LAYERS_LIST(
-    my_default_layer,
+    my_shift_layer,
     my_layer1_layer,
     my_layer2_layer,
     my_layer3_layer,
@@ -131,11 +132,27 @@ uint16_t get_tapping_term(uint16_t keycode, keyrecord_t* record) {
     return TAPPING_TERM;
 }
 
+// bool get_permissive_hold(uint16_t keycode, keyrecord_t* record) {
+//     // QK_LAYER_TAP
+//     // LT(0,
+//     if ((keycode & 0x4F00) == 0x4000) {
+//         return false;
+//     }
+
+//     // QK_MOD_TAP
+//     // MT(MOD_RCTL | MOD_RSFT | MOD_RALT | MOD_RGUI,
+//     if ((keycode & 0x7F00) == 0x7F00) {
+//         return false;
+//     }
+
+//     return true;
+// }
+
 bool process_record_user(uint16_t keycode, keyrecord_t* record) {
     // QK_LAYER_TAP
     // LT(0,
     if ((keycode & 0x4F00) == 0x4000) {
-        if (!record->tap.count && record->event.pressed) {
+        if (record->tap.count && record->event.pressed) {
             rgblight_blink_layer_repeat(3, 200, 2);
             tap_code16(C(keycode & 0xFF));
 
@@ -146,12 +163,14 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
     // QK_MOD_TAP
     // MT(MOD_RCTL | MOD_RSFT | MOD_RALT | MOD_RGUI,
     if ((keycode & 0x7F00) == 0x7F00) {
-        if (!record->tap.count && record->event.pressed) {
+        if (record->tap.count && record->event.pressed) {
             rgblight_blink_layer_repeat(4, 200, 2);
             tap_code16(A(keycode & 0xFF));
             return false;
         }
     }
+
+    //rgblight_set_layer_state(0, !(get_mods() & MOD_MASK_SHIFT));
 
     switch (keycode) {
     case RGBRST:
@@ -205,4 +224,9 @@ void post_encoder_update_user(uint8_t index, bool clockwise) {
 #ifdef RGBLIGHT_TIMEOUT
     refresh_rgb();
 #endif
+}
+
+void suspend_power_down_user(void) {
+    rgblight_suspend();
+    wait_ms(100);
 }
