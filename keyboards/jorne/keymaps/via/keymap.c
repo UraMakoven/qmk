@@ -116,21 +116,21 @@ layer_state_t layer_state_set_user(layer_state_t state) {
     return update_tri_layer_state(state, _LOWER, _RAISE, _ADJUST);
 }
 
-uint16_t get_tapping_term(uint16_t keycode, keyrecord_t* record) {
-    // QK_LAYER_TAP
-    // LT(0,
-    if ((keycode & 0x4F00) == 0x4000) {
-        return 500;
-    }
+// uint16_t get_tapping_term(uint16_t keycode, keyrecord_t* record) {
+//     // QK_LAYER_TAP
+//     // LT(0,
+//     if ((keycode & 0x4F00) == 0x4000) {
+//         return 500;
+//     }
 
-    // QK_MOD_TAP
-    // MT(MOD_RCTL | MOD_RSFT | MOD_RALT | MOD_RGUI,
-    if ((keycode & 0x7F00) == 0x7F00) {
-        return 500;
-    }
+//     // QK_MOD_TAP
+//     // MT(MOD_RCTL | MOD_RSFT | MOD_RALT | MOD_RGUI,
+//     if ((keycode & 0x7F00) == 0x7F00) {
+//         return 500;
+//     }
 
-    return TAPPING_TERM;
-}
+//     return TAPPING_TERM;
+// }
 
 // bool get_permissive_hold(uint16_t keycode, keyrecord_t* record) {
 //     // QK_LAYER_TAP
@@ -228,5 +228,58 @@ void post_encoder_update_user(uint8_t index, bool clockwise) {
 
 void suspend_power_down_user(void) {
     rgblight_suspend();
-    wait_ms(100);
 }
+
+void suspend_wakeup_init_user(void) { rgblight_wakeup(); }
+
+#ifdef OLED_ENABLE
+static void render_status(void) {
+    // Layer display
+    // switch (get_highest_layer(layer_state)) {
+    // case _QWERTY:
+    //     oled_write_ln_P(PSTR("deflt"), false);
+    //     break;
+    // case _RAISE:
+    //     oled_write_ln_P(PSTR("raise"), false);
+    //     break;
+    // case _LOWER:
+    //     oled_write_ln_P(PSTR("lower"), false);
+    //     break;
+    // case _ADJUST:
+    //     oled_write_ln_P(PSTR("adjst"), false);
+    //     break;
+    // default:
+    //     oled_write_ln_P(PSTR("error"), false);
+    // }
+
+    oled_write_P(PSTR("def"), get_highest_layer(layer_state) == _QWERTY);
+    oled_write_P(PSTR(" "), false);
+    oled_write_P(PSTR("low"), get_highest_layer(layer_state) == _LOWER);
+    oled_write_P(PSTR(" "), false);
+    oled_write_P(PSTR("rse"), get_highest_layer(layer_state) == _RAISE);
+    oled_write_P(PSTR(" "), false);
+    oled_write_ln_P(PSTR("adj"), get_highest_layer(layer_state) == _ADJUST);
+
+    led_t led_state = host_keyboard_led_state();
+    oled_write_P(PSTR("comp"), led_state.compose);
+    oled_write_P(PSTR(" "), false);
+    oled_write_ln_P(PSTR("kana"), led_state.kana);
+    oled_write_P(PSTR("num"), led_state.num_lock);
+    oled_write_P(PSTR(" "), false);
+    oled_write_P(PSTR("caps"), led_state.caps_lock);
+    oled_write_P(PSTR(" "), false);
+    oled_write_P(PSTR("scrl"), led_state.scroll_lock);
+}
+
+bool oled_task_user(void) {
+    render_status();  // Renders the current keyboard state (layer, lock, caps, scroll, etc)
+    // if (is_keyboard_master()) {
+    //     render_status();  // Renders the current keyboard state (layer, lock, caps, scroll, etc)
+    // }
+    // else {
+    //     render_logo();  // Renders a static logo
+    //     oled_scroll_left();  // Turns on scrolling
+    // }
+    return false;
+}
+#endif
