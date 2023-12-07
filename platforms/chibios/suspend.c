@@ -29,9 +29,10 @@ void suspend_idle(uint8_t time) {
 void suspend_power_down(void) {
     suspend_power_down_quantum();
     // on AVR, this enables the watchdog for 15ms (max), and goes to
-    // SLEEP_MODE_PWR_DOWN
+    //SLEEP_MODE_PWR_DOWN
 
-    wait_ms(17);
+    //wait_ms(17);
+    wait_ms(1700);
 }
 
 /** \brief suspend wakeup condition

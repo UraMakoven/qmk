@@ -233,42 +233,29 @@ void suspend_power_down_user(void) {
 void suspend_wakeup_init_user(void) { rgblight_wakeup(); }
 
 #ifdef OLED_ENABLE
-static void render_status(void) {
-    // Layer display
-    // switch (get_highest_layer(layer_state)) {
-    // case _QWERTY:
-    //     oled_write_ln_P(PSTR("deflt"), false);
-    //     break;
-    // case _RAISE:
-    //     oled_write_ln_P(PSTR("raise"), false);
-    //     break;
-    // case _LOWER:
-    //     oled_write_ln_P(PSTR("lower"), false);
-    //     break;
-    // case _ADJUST:
-    //     oled_write_ln_P(PSTR("adjst"), false);
-    //     break;
-    // default:
-    //     oled_write_ln_P(PSTR("error"), false);
-    // }
+oled_rotation_t oled_init_user(oled_rotation_t rotation) {
+    oled_set_brightness(100);
+    return OLED_ROTATION_270;
+}
 
-    oled_write_P(PSTR("def"), get_highest_layer(layer_state) == _QWERTY);
-    oled_write_P(PSTR(" "), false);
-    oled_write_P(PSTR("low"), get_highest_layer(layer_state) == _LOWER);
-    oled_write_P(PSTR(" "), false);
-    oled_write_P(PSTR("rse"), get_highest_layer(layer_state) == _RAISE);
-    oled_write_P(PSTR(" "), false);
-    oled_write_ln_P(PSTR("adj"), get_highest_layer(layer_state) == _ADJUST);
+static void render_status(void) {
+    oled_write_ln_P(get_highest_layer(layer_state) == _RAISE ? PSTR("rais") : PSTR("    "), false);
+    oled_write_ln_P(PSTR(" "), false);
+    oled_write_ln_P(get_highest_layer(layer_state) == _QWERTY ? PSTR("def") : PSTR("    "), false);
+    oled_write_ln_P(PSTR(" "), false);
+    oled_write_ln_P(get_highest_layer(layer_state) == _LOWER ? PSTR("lowr") : PSTR("    "), false);
+    oled_write_ln_P(PSTR(" "), false);
+    oled_write_ln_P(get_highest_layer(layer_state) == _ADJUST ? PSTR("adj") : PSTR("    "), false);
+    oled_write_ln_P(PSTR(" "), false);
+    oled_write_ln_P(PSTR(" "), false);
+    oled_write_ln_P(PSTR(" "), false);
 
     led_t led_state = host_keyboard_led_state();
-    oled_write_P(PSTR("comp"), led_state.compose);
-    oled_write_P(PSTR(" "), false);
-    oled_write_ln_P(PSTR("kana"), led_state.kana);
-    oled_write_P(PSTR("num"), led_state.num_lock);
-    oled_write_P(PSTR(" "), false);
-    oled_write_P(PSTR("caps"), led_state.caps_lock);
-    oled_write_P(PSTR(" "), false);
-    oled_write_P(PSTR("scrl"), led_state.scroll_lock);
+    oled_write_ln_P(led_state.num_lock ? PSTR("num") : PSTR("    "), false);
+    oled_write_ln_P(PSTR(" "), false);
+    oled_write_ln_P(led_state.caps_lock ? PSTR("caps") : PSTR("    "), false);
+    oled_write_ln_P(PSTR(" "), false);
+    oled_write_ln_P(led_state.scroll_lock ? PSTR("scrl") : PSTR("    "), false);
 }
 
 bool oled_task_user(void) {
