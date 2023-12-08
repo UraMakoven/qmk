@@ -132,21 +132,21 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 //     return TAPPING_TERM;
 // }
 
-bool get_permissive_hold(uint16_t keycode, keyrecord_t* record) {
-    // QK_LAYER_TAP
-    // LT(0,
-    if ((keycode & 0x4F00) == 0x4000) {
-        return false;
-    }
+// bool get_permissive_hold(uint16_t keycode, keyrecord_t* record) {
+//     // QK_LAYER_TAP
+//     // LT(0,
+//     if ((keycode & 0x4F00) == 0x4000) {
+//         return false;
+//     }
 
-    // QK_MOD_TAP
-    // MT(MOD_RCTL | MOD_RSFT | MOD_RALT | MOD_RGUI,
-    if ((keycode & 0x7F00) == 0x7F00) {
-        return false;
-    }
+//     // QK_MOD_TAP
+//     // MT(MOD_RCTL | MOD_RSFT | MOD_RALT | MOD_RGUI,
+//     if ((keycode & 0x7F00) == 0x7F00) {
+//         return false;
+//     }
 
-    return true;
-}
+//     return true;
+// }
 
 bool process_record_user(uint16_t keycode, keyrecord_t* record) {
     // QK_LAYER_TAP
